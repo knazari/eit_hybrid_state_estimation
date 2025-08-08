@@ -35,6 +35,57 @@ cd Hybrid-State-Estimation-EIT-Tactile
 pip install -r requirements.txt
 ````
 
+## 🧠 Teensy Board Installation on Linux (Tested on Ubuntu)
+
+This guide walks you through installing the **Arduino IDE (v1.8.19)** and setting it up to work with the **Teensy board** on Linux.
+
+---
+
+### 📥 Step 1: Download Arduino IDE 1.8.19
+
+Download and unzip Arduino IDE version **1.8.19** from the official Arduino website:
+
+➡️ [https://www.arduino.cc/en/software/](https://www.arduino.cc/en/software/)
+
+Choose the **Linux 64-bit** version (`.tar.xz`).
+
+---
+
+### ⚙️ Step 2: Install udev Rules for Teensy
+
+Teensy requires a udev rule so it can be accessed without root permissions.
+
+1. Go to: [https://www.pjrc.com/teensy/td_download.html](https://www.pjrc.com/teensy/td_download.html)
+2. Scroll down and find the **udev rule** text.
+3. Create a new file:
+nano 00-teensy.rules
+4. Paste the rule contents into the file and save it.
+
+5. Move the rule into the correct system directory:
+
+         sudo cp 00-teensy.rules /etc/udev/rules.d/
+
+### 🔧 Step 3: Install Teensyduino
+
+Download the Teensyduino Linux Installer (X86 64-bit) from the same PJRC download page.
+Give it permission and run:
+
+      chmod 755 TeensyduinoInstall.linux64 ./TeensyduinoInstall.linux64
+
+When prompted, select the previously extracted Arduino 1.8.19 folder.
+
+✅ Final Step: Verify Installation
+
+Launch the Arduino IDE (arduino inside the unzipped folder). Connect your Teensy board via USB.
+ You should now see "Teensy" listed under Tools > Board.
+
+📝 Notes
+
+This setup only works with Arduino 1.8.19 (not the newer 2.x versions).
+
+If the Teensy board doesn't show up, try restarting your system or unplugging/replugging the board.
+You may need to install additional packages like libusb if prompted.
+
 ## Usage
 
 1. **Run EIT simulation and generate voltage patterns:**
@@ -59,6 +110,7 @@ pip install -r requirements.txt
 
 * Python 3.9+
 * PyEIT
+* Arduino 1.8.19
 * NumPy
 * SciPy
 * PyTorch
