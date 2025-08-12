@@ -13,8 +13,8 @@
 #define NUM_MEAS           NUM_ELECTRODES*NUM_ELECTRODES
 
 #define AD5930_CLK_FREQ    50000000
-#define TEST_FREQ          20000    // current frequency always below 50k
-#define NUM_PERIODS        8        // Number of signal periods to measure
+#define TEST_FREQ          10000    // current frequency always below 50k
+#define NUM_PERIODS        12        // Number of signal periods to measure
 #define ADC_AVG            8        // Number of ADC samples to average for each analog reading
 
 // AD5270 commands
@@ -467,12 +467,6 @@ uint32_t read_signal(double * rms, double * mag, double * phase, uint16_t * erro
         sample_sum += adc_troughs[i];
     adc_min = sample_sum / adc_trough_count;
 
-//    for (i = 0, sample_sum =  0; i < NUM_PERIODS; i++)
-//        sample_sum += adc_peaks[i];
-//    adc_max = sample_sum / NUM_PERIODS;
-//    for (i = 0, sample_sum = 0; i < NUM_PERIODS; i++)
-//        sample_sum += adc_troughs[i];
-//    adc_min = sample_sum / NUM_PERIODS;
 
     /* Calculate phase offset */
     int16_t phase_offset_cycles;
@@ -604,19 +598,6 @@ void calibrate_gain(meas_t drive_type, meas_t meas_type) {
                 Serial.print(_gain);
                 break;
             }
-//            if (rms_sum > 0.2 && rms_sum < 1.5 && error_sum < 20) {
-//                Serial.print(_gain);
-//                break;
-//            }
-//            if (j == 250){
-//                Serial.println();
-//                Serial.print(mag_sum);
-//                Serial.print(" ");
-//                Serial.print(rms_sum);
-//                Serial.print(" ");
-//                Serial.print(error_sum);
-//                Serial.println();
-//            }
         }
         if (_gain > min_current_gain)
             min_current_gain = _gain;
@@ -667,19 +648,6 @@ void calibrate_gain(meas_t drive_type, meas_t meas_type) {
                 Serial.print(_gain);
                 break;
             }
-//            if (rms_sum > 0.2 && rms_sum < 1.5 && error_sum < 30) {
-//                Serial.print(_gain);
-//                break;
-//            }
-//            if (j == 3){
-//                Serial.println();
-//                Serial.print(mag_sum);
-//                Serial.print(" ");
-//                Serial.print(rms_sum);
-//                Serial.print(" ");
-//                Serial.print(error_sum);
-//                Serial.println();
-//            }
         }
         if (_gain > min_voltage_gain)   // && _gain != 1023
             min_voltage_gain = _gain;
@@ -693,126 +661,8 @@ void calibrate_gain(meas_t drive_type, meas_t meas_type) {
     mux_write(CHIP_SEL_MUX_SINK, 0, MUX_DIS);
     mux_write(CHIP_SEL_MUX_VP, 0, MUX_DIS);
     mux_write(CHIP_SEL_MUX_VN, 0, MUX_DIS);
-
-
-//    // Set current source electrodes to origin, set voltage measurement electrodes to overlap
-//    mux_write(CHIP_SEL_MUX_SRC, elec_to_mux[0], MUX_EN);
-//    mux_write(CHIP_SEL_MUX_VP, elec_to_mux[0], MUX_EN);
-//    if (drive_type == AD) {
-//        mux_write(CHIP_SEL_MUX_SINK, elec_to_mux[1], MUX_EN);
-//        mux_write(CHIP_SEL_MUX_VN, elec_to_mux[1], MUX_EN);
-//    } else if (drive_type == OP) {
-//        mux_write(CHIP_SEL_MUX_SINK, elec_to_mux[16], MUX_EN);
-//        mux_write(CHIP_SEL_MUX_VN, elec_to_mux[16], MUX_EN);
-//    }
-//
-//    delay(5);
-//
-//    // Set voltage measurement gain to 1 (maximum current (5V pk-pk) must be within ADC range)
-//    AD5270_Shutdown(CHIP_SEL_MEAS, 1);
-//
-//    uint16_t i, j;
-//    uint32_t error_sum;
-//    double mag_sum;
-//
-//    // Calibrate current source
-//    for (i = 0; i < 1024; i++) {
-//        current_gain = i;
-//        AD5270_Set(CHIP_SEL_DRIVE, current_gain);
-//        delayMicroseconds(500);
-//
-//        double mag;
-//        uint16_t error;
-//        mag_sum = 0;
-//        error_sum = 0;
-//        for (j = 0; j < 10; j++) {
-//            read_signal(NULL, &mag, NULL, &error, 0);
-//            mag_sum += mag;
-//            error_sum += error;
-//        }
-//        mag_sum = mag_sum / 10;
-//        error_sum = error_sum / 10;
-//
-//        // Accept the highest gain such that reading a valid sinusoid
-//        if (mag_sum > 0.5 && mag_sum < 2.1 && error_sum < 30)
-//            break;
-//    }
-//
-//    // Set voltage measurement electrodes to the highest voltage differential point
-//    if (meas_type == AD) {
-//        mux_write(CHIP_SEL_MUX_VP, elec_to_mux[2], MUX_EN);
-//        mux_write(CHIP_SEL_MUX_VN, elec_to_mux[3], MUX_EN);
-//    } else if (meas_type == OP) {
-//        mux_write(CHIP_SEL_MUX_VP, elec_to_mux[1], MUX_EN);
-//        mux_write(CHIP_SEL_MUX_VN, elec_to_mux[17], MUX_EN);
-//    }
-//
-//    delay(5);
-//
-//    AD5270_Shutdown(CHIP_SEL_MEAS, 0);
-//
-//    // Calibrate voltage measurement
-//    for (i = 0; i < 1024; i++) {
-//        voltage_gain = i;
-//        AD5270_Set(CHIP_SEL_MEAS, voltage_gain);
-//        delayMicroseconds(500);
-//
-//        double mag;
-//        uint16_t error;
-//        mag_sum = 0;
-//        error_sum = 0;
-//        for (j = 0; j < 10; j++) {
-//            read_signal(NULL, &mag, NULL, &error, 0);
-//            mag_sum += mag;
-//            error_sum += error;
-//        }
-//        mag_sum = mag_sum / 10;
-//        error_sum = error_sum / 10;
-//
-//        // Accept the highest gain such that reading a valid sinusoid
-//        if (mag_sum > 0.5 && mag_sum < 2.1 && error_sum < 30)
-//            break;
-//    }
-//
-//    mux_write(CHIP_SEL_MUX_SRC, 0, MUX_DIS);
-//    mux_write(CHIP_SEL_MUX_SINK, 0, MUX_DIS);
-//    mux_write(CHIP_SEL_MUX_VP, 0, MUX_DIS);
-//    mux_write(CHIP_SEL_MUX_VN, 0, MUX_DIS);
 }
 
-/* Find the magnitude and phase offset of the highest voltage differental point */
-// void calibrate_signal(meas_t drive_type, meas_t meas_type) {
-
-//     // Set current source electrodes to origin
-//     mux_write(CHIP_SEL_MUX_SRC, elec_to_mux[0], MUX_EN);
-//     if (drive_type == AD)
-//         mux_write(CHIP_SEL_MUX_SINK, elec_to_mux[1], MUX_EN);
-//     else if (drive_type == OP)
-//         mux_write(CHIP_SEL_MUX_SINK, elec_to_mux[16], MUX_EN);
-
-//     // Set voltage measurement electrodes to the highest voltage differential point
-//     if (meas_type == AD) {
-//         // mux_write(CHIP_SEL_MUX_VP, elec_to_mux[30], MUX_EN);
-//         // mux_write(CHIP_SEL_MUX_VN, elec_to_mux[31], MUX_EN);
-//         mux_write(CHIP_SEL_MUX_VP, elec_to_mux[14], MUX_EN);
-//         mux_write(CHIP_SEL_MUX_VN, elec_to_mux[15], MUX_EN); // 16 electrodes
-//     } else if (meas_type == OP) {
-//         mux_write(CHIP_SEL_MUX_VP, elec_to_mux[15], MUX_EN);
-//         mux_write(CHIP_SEL_MUX_VN, elec_to_mux[31], MUX_EN);
-//     }
-
-//     delay(5);
-
-//     /* Determine the magnitude and phase offset of the reference signal */
-//     ref_signal_mag = 1.0;
-//     phase_offset = 0;
-//     uint32_t sample_time = read_signal(NULL, &ref_signal_mag, &phase_offset, NULL, 0);
-
-//     mux_write(CHIP_SEL_MUX_SRC, 0, MUX_DIS);
-//     mux_write(CHIP_SEL_MUX_SINK, 0, MUX_DIS);
-//     mux_write(CHIP_SEL_MUX_VP, 0, MUX_DIS);
-//     mux_write(CHIP_SEL_MUX_VN, 0, MUX_DIS);
-// }
 
 void calibrate_signal(meas_t drive_type, meas_t meas_type) {
 
@@ -965,11 +815,6 @@ void read_frame(meas_t drive_type, meas_t meas_type, double * rms_array, double 
             }
         }
     }
-
-//    mux_write(CHIP_SEL_MUX_SRC, 0, MUX_DIS);
-//    mux_write(CHIP_SEL_MUX_SINK, 0, MUX_DIS);
-//    mux_write(CHIP_SEL_MUX_VP, 0, MUX_DIS);
-//    mux_write(CHIP_SEL_MUX_VN, 0, MUX_DIS);
 }
 
 void setup() 
@@ -1024,17 +869,6 @@ void setup()
 
 //    SPI.begin();
 
-    /* B24 = 0 (start freq high and low regs can be written independently)
-    * DAC ENABLE = 1 (DAC enabled)
-    * SINE/TRI = 1 (sine output)
-    * MSBOUTEN = 1 (MSBOUT enabled)
-    * CW/BURST = 1 (no mid-scale output after burst)
-    * INT/EXT BURST = 1 (burst controlled by CTRL pin)
-    * INT/EXT INCR = 1 (frequency increment controlled by CTRL pin)
-    * MODE = 1 (frequency saw sweep)
-    * SYNCSEL = 0 (SYNCOUT outputs pulse at each freq increment)
-    * SYNCOUTEN = 0 (SYNCOUT disabled)
-    */
     AD5930_Write(CTRL_REG, 0b011111110011);
     AD5930_Set_Start_Freq(TEST_FREQ);
 
@@ -1047,75 +881,22 @@ void setup()
 
     calibrate_samples();
     // calibrate_gain(OP, AD);
-    AD5270_Set(CHIP_SEL_DRIVE, 20); // jash 220R currrent gain smaller means higher current
-    AD5270_Set(CHIP_SEL_MEAS, 40); // jash 220R voltage gain smaller means increase voltage
+    AD5270_Set(CHIP_SEL_DRIVE, 100); // jash 220R currrent gain smaller means higher current
+    AD5270_Set(CHIP_SEL_MEAS, 20); // jash 220R voltage gain smaller means increase voltage
     calibrate_signal(AD, AD);
-//    AD5270_Set(CHIP_SEL_DRIVE, 594);
-//    AD5270_Set(CHIP_SEL_MEAS, 23);
-  //  AD5270_Shutdown(CHIP_SEL_DRIVE, 1);
-  //  AD5270_Shutdown(CHIP_SEL_MEAS, 1);
 
     mux_write(CHIP_SEL_MUX_SRC, elec_to_mux[0], MUX_EN);
     mux_write(CHIP_SEL_MUX_SINK, elec_to_mux[1], MUX_EN);
     mux_write(CHIP_SEL_MUX_VP, elec_to_mux[0], MUX_EN);
     mux_write(CHIP_SEL_MUX_VN, elec_to_mux[1], MUX_EN);
-
-    // Serial.print("Current gain: ");
-    // Serial.println(current_gain);
-    // Serial.print("Measurement gain: ");
-    // Serial.println(voltage_gain);
-    // Serial.print("Sample rate (uS per reading): ");
-    // Serial.println(sample_rate, 4);
-    // Serial.print("Samples per period: ");
-    // Serial.println(samples_per_period);
-    // Serial.print("Reference signal magnitude (V): ");
-    // Serial.println(ref_signal_mag, 4);
-    // Serial.print("Reference signal phase offset (radians): ");
-    // Serial.println(phase_offset, 4);
-
-    // uint16_t i;
-
-    // /* Read resting impedance state for calibration */
-    // for(i = 0; i < 30; i++)
-    // {
-    //     read_frame(OP, AD, signal_rms, signal_mag, signal_phase, NUM_ELECTRODES);
-        
-    //     uint16_t j;
-    //     for (j = 0; j < NUM_MEAS; j++)
-    //     {
-    //         if (signal_rms[j] != 0)
-    //             cur_frame[j] = 0.80 * cur_frame[j] + 0.20 * (signal_rms[j]);
-    //     }
-    // }
-
-    // Serial.println("origin frame");
-    // for (i = 0; i < NUM_MEAS; i++)
-    // {                                                                             
-    //     Serial.println(cur_frame[i], 4);
-    // }
 }
 
 void loop() 
 {   
     uint16_t i;
     
-//    double mag, rms;
-//    uint16_t error;
-//    read_signal(&rms, &mag, NULL, &error, 0);
-//    Serial.print(rms,4);
-//    Serial.print("\t");
-//    Serial.println(mag, 4);
-//    delay(1000);
     
     read_frame(AD, AD, signal_rms, signal_mag, signal_phase, NUM_ELECTRODES);
-
-//    for(i = 0; i < 20; i++)
-//    {
-//        cur_frame[i] = 0.50 * cur_frame[i] + 0.50 * signal_rms[i];
-//        Serial.print(cur_frame[i], 4);
-//        Serial.print("\t");
-//    }
-//    Serial.println();
 
     if (millis() - frame_delay > 350) {
         // Serial.println("frame");
@@ -1131,34 +912,4 @@ void loop()
         delay(10);
     }
 
-//    if (Serial.available())
-//    {
-//        uint8_t key = Serial.read();
-////
-////        mux_write(CHIP_SEL_MUX_VP, elec_to_mux[pin_num], MUX_EN);
-////        //mux_write(CHIP_SEL_MUX_VN, elec_to_mux[(pin_num + NUM_ELECTRODES/2) % NUM_ELECTRODES], MUX_EN);
-////        mux_write(CHIP_SEL_MUX_VN, elec_to_mux[(pin_num + 1) % NUM_ELECTRODES], MUX_EN);
-////        Serial.print(pin_num);
-////        Serial.print("\t");
-////        //Serial.println((pin_num + NUM_ELECTRODES/2) % NUM_ELECTRODES);
-////        Serial.println((pin_num + 1) % NUM_ELECTRODES);
-////        pin_num = (pin_num+1) % NUM_ELECTRODES;
-//
-////        mux_write(CHIP_SEL_MUX_SRC, elec_to_mux[pin_num], MUX_EN);
-////        Serial.println(pin_num);
-////        pin_num = (pin_num+1) % NUM_ELECTRODES;
-//
-//        const int rheo = CHIP_SEL_DRIVE;
-//        if (rheo_val >= 0x400) {
-//            AD5270_Shutdown(rheo, 1);
-//            Serial.println("off");     
-//            rheo_val = 0;
-//        } else {
-//            if (rheo_val == 0)
-//                AD5270_Shutdown(rheo, 0);
-//            AD5270_Set(rheo, rheo_val);
-//            Serial.println(rheo_val);
-//            rheo_val++;
-//        }
-//    }
 }
