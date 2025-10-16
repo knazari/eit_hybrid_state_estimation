@@ -881,8 +881,8 @@ void setup()
 
     calibrate_samples();
     // calibrate_gain(OP, AD);
-    AD5270_Set(CHIP_SEL_DRIVE, 100); // jash 220R currrent gain smaller means higher current
-    AD5270_Set(CHIP_SEL_MEAS, 20); // jash 220R voltage gain smaller means increase voltage
+    AD5270_Set(CHIP_SEL_DRIVE, 1000); // jash 220R currrent gain smaller means higher current
+    AD5270_Set(CHIP_SEL_MEAS, 10); // jash 220R voltage gain smaller means increase voltage
     calibrate_signal(AD, AD);
 
     mux_write(CHIP_SEL_MUX_SRC, elec_to_mux[0], MUX_EN);

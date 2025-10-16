@@ -141,7 +141,7 @@ def update_eit_image(voltage_data, message=None):
     absolute_values = np.abs(subtraction)
     sum_absolute_values = np.sum(absolute_values)
 
-    if sum_absolute_values > 0.3:
+    if sum_absolute_values > 0.3:# 0.3:
         
         ds = 192.0 * eit_bp.solve(v1, v0, normalize=True, log_scale=False)
     else:
